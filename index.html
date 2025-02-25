@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flight Path Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        const planeIcon = L.divIcon({
+            html: `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0L15 9H21L12 24L3 9H9L12 0Z" fill="blue"/>
+                   </svg>`,
+            className: '',
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+        });
+
+        const map = L.map('map').setView([51.4700, -0.4543], 5);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        const flightPath = [
+            [51.4700, -0.4543],
+            [36.1242, -86.6782]
+        ];
+
+        const polyline = L.polyline(flightPath, { color: 'blue' }).addTo(map);
+
+        const planeMarker = L.marker([51.4700, -0.4543], { icon: planeIcon }).addTo(map);
+
+        let step = 0;
+        const steps = 100;
+        const delay = 100;
+
+        function animatePlane() {
+            if (step <= steps) {
+                const lat = flightPath[0][0] + (flightPath[1][0] - flightPath[0][0]) * (step / steps);
+                const lng = flightPath[0][1] + (flightPath[1][1] - flightPath[0][1]) * (step / steps);
+                planeMarker.setLatLng([lat, lng]);
+                step++;
+                setTimeout(animatePlane, delay);
+            }
+        }
+
+        animatePlane();
+    </script>
+</body>
+</html>
